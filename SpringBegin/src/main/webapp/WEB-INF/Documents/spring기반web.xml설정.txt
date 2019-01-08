@@ -1,0 +1,177 @@
+﻿>>>> spring기반 web.xml 설정 <<<<<
+
+
+ ▶ web.xml
+
+    web.xml은 Deployment Descriptor(배포 서술자) 라고도 하며 
+    Tomcat의 Deployment Descriptor(배포 서술자)는 web.xml로 환경설정 부분을 담당한다.
+
+ ※ Deployment Descriptor?
+    배포 서술자(DD, Deployment Descriptor) 는 Java EE 스펙으로 웹 애플리케이션의 기본적인 설정을 위해 작성하는 파일로, 
+    보통은 WEB-INF/web.xml 파일을 말한다.
+    배포 서술자는 web.xml 이외에도 EJB를 위한 ejb-jar.xml, 웹서비스를 위한 webservices.xml 등이 있으며, 
+  JSP와 서블릿만으로 구성된 경우에는 web.xml 파일만 사용하면 된다고 한다.
+
+ ※ web.xml(DD)의 이점?
+    1. 작성한 소스코드를 수정하지 않고도 웹 어플리케이션을 '커스터마이징' 할 수 있다.
+    2. 이미 테스트 된 소스코드의 수정을 최소화 한다.
+    3. 소스코드가 없어도 수정이 가능하다.
+    4. 재 컴파일 하지 않고 서버의 자원을 변경할 수 있다.
+    5. 접근제한, 보안, 오류페이지를 설정하고 초기화 값의 구성 등을 할 수 있다.
+
+
+ ※ web.xml의 구조 및  설정
+
+    XML파일임을 알리는 부분. 내용에 한글을 포함할 경우가 있기 때문에, 
+    인코딩 속성은 UTF-8로 설정한다. (eclipse는 web.xml 생성시 자동 설정)
+    <?xml version="1.0" encoding="UTF-8"?>
+
+   ■ web-app
+      <web-app> 태그는 web.xml 파일의 루트 엘리먼트이다. 
+           모든 웹 애플리케이션 설정은 <web-app></web-app> 태그 사이에 위치하여야 한다.
+      http://java.sun.com/xml/ns/j2ee/web_app_3_0.xsd 파일의 스키마정의를 따른다는 뜻. 
+      위의 인코딩과 <web-app> 태그는 이클립스 web.xml 생성시 자동으로 등록되어 있다.
+      <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	           xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"> 
+
+   ■ display-name
+      DD 파일의 title 정도로 보면 되고, 이클립스에서는 기본적으로 프로젝트명으로 설정되며 수정 가능하다.
+      <display-name>webStudy</display-name>
+      <display-name>Archetype Created Web Application</display-name>
+
+   ■ description
+       어떤 프로젝트를 위한 배포 서술자인지 상세하게 기록한다.
+      <description>webStudy sample project</description>
+
+   ■ ContextLoaderListener
+      Spring MVC는 web.xml - dispatcher.xml 로부터 1개 이상의 스프링 설정 정보를 읽어들일수 있다. 
+          이때 한개만으로 충분한 경우 dispatcher 에 지정하면 되지만 2개 이상이면 너무 복잡해지므로 contextConfigLocation 초기화 파라미터에 설정파일 목록을 지정하면 된다.
+      
+      org.springframework.web.context.ContextLoaderListener 클래스는  
+      C:/Users/user1/.m2/repository/org/springframework/spring-web/4.3.4.RELEASE/spring-web-4.3.4.RELEASE-sources.jar 에 들어있음.
+      
+          모든 서블릿과 필터들이 공유해서 사용하는 클래스가 org.springframework.web.context.ContextLoaderListener 인데
+          이 클래스의 초기화 파라미터 파일은 contextConfigLocation 에 설정된 <param-value> 엘리먼트의 파일명이다.
+          일반적으로 contextConfigLocation 에 설정된 파라미터 밸류 파일명에는
+          해당 클래스가 웹에 종속적인 서블릿이건 웹과 관련없는 클래스이든 모든 클래스들이 공통적으로 필요로 하는 myBatis(JDBC) 연결에 관련된 내용을 기술해준다.
+      
+      <listener>
+	    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+      </listener>
+      <context-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>
+                   /WEB-INF/spring/application-context.xml
+                   /WEB-INF/spring/application-context-security.xml
+            </param-value>
+      </context-param>
+
+   ■ servlet
+     org.springframework.web.servlet.DispatcherServlet 클래스는 
+     C:/Users/user1/.m2/repository/org/springframework/spring-webmvc/4.3.4.RELEASE/spring-webmvc-4.3.4.RELEASE-sources.jar 에 들어있음.
+     
+      DispatcherServlet 클래스를 초기화하여 spring의 servlet context를 생성한다. 
+      초기화 param으로 bean 메타 설정 파일의 위치를 넘겨 준다.
+      servlet-mapping은 url pattern으로 지정된 값으로 웹 요청이 들어왔을 때 servlet-name에 
+      지정되어 있는 이름의 servlet을 호출하겠다는 의미이다.
+      spring에서는 DispatcherServlet이 모든 요청을 받고, 요청의 URL과 맵핑하는 Controller에 위임한다. 
+      예를 들어 Controller class에 @RequestMapping("/list") annotation으로 지정되어 잇는 method가 존재하면 
+      http://localhost:8080/list.do 요청 시 DispatcherServlet이 해당하는 URL과 mapping되는 정보를 찾은 후 연결되는 method에 요청을 위임한다.
+      <servlet>
+           <servlet-name>dispatcher</servlet-name>
+           <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+           <init-param>
+                <param-name>contextConfigLocation</param-name>
+                <param-value>/WEB-INF/spring/dispatcher-servlet.xml</param-value>
+           </init-param>
+           <load-on-startup>1</load-on-startup> // servlet 최초 요청시 우선순위 지정옵션
+      </servlet>
+
+      <servlet-mapping>
+           <servlet-name>dispatcher</servlet-name>
+           <url-pattern>*.do</url-pattern>
+      </servlet-mapping>
+
+     ==> DispatcherServlet 클래스가 우리가 MyMVC 시간에 배웠던 FrontController 서블릿 클래스에 해당한다고 보면 된다.
+         DispatcherServlet 클래스의 환경설정 초기값은 <param-value>엘리먼트의 파일에 내용을 읽어와서 초기설정을 해둔다.
+               일반적으로 <param-value>엘리먼트의 파일에는 웹에 종속적인 내용들인 
+               1. 앞으로 생성할 모든 컨트롤러, 서비스단, Aspect 등 (*.java) 클래스 파일이 저장되어질 패키지명을 기술하고,
+               2. 이미지, 동영상, js, css 파일등이 위치하는 경로를 기술하고,
+               3. 뷰단 페이지(.jsp)의 경로를 기술한다. 
+	     
+   ■ filter
+      필터는 웹 애플리케이션 전반에 걸쳐 특정 URL이나 파일 요청 시 먼저 로딩되어 사전에 처리할 작업을 수행(필터링)하고 해당 요청을 처리하는 자바 웹 애플리케이션 유형 중 하나이다. 
+      <filter-mapping>  에서는 해당 필터를 적용할 URL패턴이나 Servlet 등을 등록한다. 
+      스프링 시큐리티 예제를 만들어보면서도 시큐리티 관련 filter를 등록해야 한다.
+      <filter> 
+          <filter-name>encodingFilter</filter-name> 
+          <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class> 
+          <init-param> 
+               <param-name>encoding</param-name> 
+               <param-value>UTF-8</param-value> 
+          </init-param> 
+      </filter>
+
+      <filter-mapping>
+          <filter-name>encodingFilter</filter-name>
+          <url-pattern>/＊</url-pattern>
+      </filter-mapping>
+
+
+    ■ session-config
+      세션 설정
+      <session-config>
+           <session-timeout>30</session-timeout>
+      </session-config>
+
+
+    ■ error-page
+       각 error-code 별 page 설정
+       <error-page>
+            <error-code>401</error-code>
+            <location>/resources/commons/error/serverError.jsp</location>
+       </error-page>
+       <error-page>
+            <error-code>403</error-code>
+            <location>/resources/commons/error/serverError.jsp</location>
+       </error-page>
+       <error-page>
+            <error-code>404</error-code>
+            <location>/resources/commons/error/notFound.jsp</location>
+       </error-page>
+       <error-page>
+	    <error-code>500</error-code>
+	    <location>/resources/commons/error/serverError.jsp</location>
+       </error-page>
+
+    ■ welcome-file-list
+       웹 애플리케이션 요청 시 시작파일을 지정한다.
+       <welcome-file-list>
+           <welcome-file>index.html</welcome-file>
+           <welcome-file>index.jsp</welcome-file>
+       <welcome-file-list>
+
+★ ContextLoaderListener : 
+   서블릿에서 제공하는 ServletContextListener를 확장하여 만든 것으로 
+   웹 어플리케이션이 서블릿 컨테이너에 로딩될 때 실행되는 리스너.
+   이 리스너가 하는 일은 웹 어플리케이션이 로딩될 때 WebApplicationContext를 만드는 것이다. 
+   이렇게 생성된 WebApplicationContext는 ContextConfigLocation에 설정한 bean 설정 파일을 사용해서 웹 어플리케이션에서 사용할 객체를 관리해주는 역할을 한다.
+
+   ContextLoaderListener는 어플리케이션 전체에서 사용할 WAC(WebApplicationContext)를 만들고, 
+   DispatcherServlet은 해당 서블릿에서만 사용할 WAC(WebApplicationContext)를 만든다.
+
+   WebApplicationContext는 상속구조를 가질 수 있는데, 이 때 몇가지 중요한 특징이 있다.
+
+   자식 WAC에서 부모 WAC의 빈을 참조할 수 있다.
+   부모 WAC에서는 자식 WAC의 빈을 참조할 수 없다.
+   자식 WAC에서 어떤 빈을 참조할 때, 먼저 자기 자신 내부에 있는 빈을 참조한다. 
+   만약 자기 자신 내부에 없다면 부모 쪽에서 찾아보고,
+   부모쪽에도 원하는 빈이 없다면 예외를 발생시킨다. 
+   그래서 보통 WAC(CLL)과 WAC(DS)로 다음과 같이 빈을 나눠서 관리합니다.
+
+   WAC(ContextLoaderListener) : 웹에 종속적이지 않은 빈 ex) 서비스, DAO
+   WAC(DispatcherServlet) : 웹에 종속적인 빈 ex) 컨트롤러, 스프링, MVC관련 빈
+
+
+출처: http://seongilman.tistory.com/16 [SEONG]

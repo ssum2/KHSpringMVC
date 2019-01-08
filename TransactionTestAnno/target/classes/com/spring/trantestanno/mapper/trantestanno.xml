@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- #11. mapper 기본 설정 -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+
+<!-- #12. 루트 엘리먼트 및 네임스페이스 설정하기(이 네임스페이스의 이름은 프로젝트 전체 내에서 반드시 고유해야만 한다.) --> 
+<mapper namespace="trantestanno">
+
+	<select id="getLoginUserPoint" parameterType="String" resultType="int">
+		select point
+		from tx_member
+		where id = #{userid}
+	</select>
+
+	<insert id="insert_tx_notices" parameterType="com.spring.trantestanno.model.NoticeVO">
+		insert into tx_notices(seq, writerid, title, content) 
+		values(seq_tx_notices.nextval, #{writerid}, #{title}, #{content} )
+	</insert>
+	
+	<update id="update_tx_notices" parameterType="String">
+		update tx_member set point = point + 1
+		where id = #{writerid}
+	</update>
+	
+	<resultMap type="HashMap" id="noticeMap" >
+		<result property="RNO" 	    column="rno" 		javaType="String"/> 
+		<result property="SEQ" 	    column="seq" 		javaType="String"/> 
+		<result property="NAME"     column="name" 		javaType="String"/>
+		<result property="TITLE" 	column="title" 		javaType="String"/>
+		<result property="CONTENT" 	column="content" 	javaType="String"/>
+	</resultMap>
+	
+	<select id="list" resultMap="noticeMap">
+		select rno, seq, name, title, content
+	    from 
+	    (
+	      select row_number() over(order by to_number(seq)) AS rno, to_number(seq) as seq, name, title, content
+	      from tx_notices N join tx_member M
+	      on N.writerid = M.id
+	    ) V    
+	    order by seq desc
+	</select>
+	
+	
+	<resultMap type="HashMap" id="contentMap" >
+		<result property="PREVIOUSSEQ"  	column="previousSeq" 	javaType="String"/> 
+		<result property="PREVIOUSTITLE" 	column="previousTitle" 	javaType="String"/> 
+		<result property="SEQ"   			column="seq" 			javaType="String"/>
+		<result property="TITLE"   			column="title" 			javaType="String"/>
+		<result property="NAME"   			column="name" 			javaType="String"/>
+		<result property="CONTENT" 	 		column="content" 		javaType="String"/>
+		<result property="NEXTSEQ" 	 		column="nextSeq" 		javaType="String"/>
+		<result property="NEXTTITLE" 	 	column="nextTitle" 		javaType="String"/>
+	</resultMap>
+	
+	<select id="contentView" parameterType="int" resultMap="contentMap">
+		select previousSeq, previousTitle, seq, title, name, content, nextSeq, nextTitle
+		from    
+		(
+		     select lag(to_number(N.seq) ) over(order by to_number(N.seq) desc) as previousSeq
+		            , lag(N.title) over(order by to_number(N.seq) desc) as previousTitle
+		            , to_number(N.seq) as seq
+		            , N.title
+		            , M.name
+		            , N.content
+		            , lead(to_number(N.seq) ) over(order by to_number(N.seq) desc) as nextSeq
+		            , lead(N.title) over(order by to_number(N.seq) desc) as nextTitle
+		    from tx_notices N join tx_member M 
+		    on N.writerid = M.id
+		) V
+		where V.seq = #{seq}
+	</select>
+	
+	
+	
+
+</mapper>

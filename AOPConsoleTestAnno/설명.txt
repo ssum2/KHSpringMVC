@@ -1,0 +1,548 @@
+﻿*** 콘솔 프로젝트 실습하기 
+	- 3번에서 구현한 메모 프로젝트를 AOP 설정 방식을 바꾸어 다시 구현한다.
+	- 위의 Advice 예제들을 XML 스키마 방식이 아닌 어노테이션 방식으로 다시 구현
+	- XML 대신에 어노테이션을 사용한다는 것을 제외하고 모든 업무는 동일하게 구현
+
+	a. 프로젝트 생성하기
+		New > Other > Spring Legacy Project > Simple Spring Maven > "AOPConsoleTestAnno"
+	b. pom.xml 의존 파일 설정하기
+		기존 <dependency>는 모두 삭제하고 아래의 <dependency> 추가하기 
+		- spring-core
+		- spring-context
+		- spring-aop
+		- aspectjweave
+	c. 파일 생성하기
+		- 파일을 생성하고 코드를 작성
+		1. src/main/java > com.test.memo > IMemo 인터페이스 생성
+		2. src/main/java > com.test.memo > Memo 클래스 생성 (주 업무 담당, 서비스 객체)
+		3. src/main/java > com.test.memo > MainTest 클래스 생성 (메인 클래스)
+		4. src/main/java > com.test.memo > Logger 클래스 생성 (보조 업무 담당)
+		5. src/main/resources > memo.xml 생성
+	d. 실행
+		- MainTest.main() 실행하기
+
+[업무 순서] 주업무(######) 보조업무(*******)
+▶   시간 기록 시작       메모 작성        시간 기록 끝  ▶
+   *********************############*******************
+
+[pom.xml] - 이전 프로젝트와 동일
+
+<dependencies>
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-core</artifactId>
+		<version>4.3.1.RELEASE</version>
+	</dependency>
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-context</artifactId>
+		<version>4.0.4.RELEASE</version>
+	</dependency>
+	<dependency>
+		<groupId>org.springframework</groupId>
+		<artifactId>spring-aop</artifactId>
+		<version>4.0.4.RELEASE</version>
+	</dependency>
+	<dependency>
+		<groupId>org.aspectj</groupId>
+		<artifactId>aspectjweaver</artifactId>
+		<version>1.7.4</version>
+	</dependency>
+</dependencies>	
+
+
+[IMemo.java] - 이전 프로젝트와 동일
+
+public interface IMemo {
+
+	//주업무 - 메모 작성하기
+	void write(String memo);
+
+}
+
+
+[Memo.java] - 이전 프로젝트와 동일
+
+public class Memo implements IMemo {
+
+	@Override //주업무 - 메모 작성하기
+	public void write(String memo) {
+
+		System.out.println("메모 : " + memo);	
+
+	}
+
+}
+
+
+[Logger.java] - 변화된 부분이 많이 있으니까 주의 깊게 볼것!!
+
+//보조 업무 객체를 관심 객체로 등록한다.
+// - 기존의 XML <aop:aspect> 역할을 한다. (기존 프로젝트 memo.xml 파일을 열어서 꼭 비교해볼 것!!)
+@Aspect
+public class Logger {
+
+	//Pointcut을 생성한다.
+	// - 아래의 메소드가 기존의 XML <aop:pointcut> 역할을 한다.
+	// - void + 인자값 없음으로 선언한다. 
+	// - 선언해도 어차피 어노테이션의 AspectJ 표현식이 우선이기 때문에 메소드 자체의 형식은 의미없다.
+	// - 또한 구현부도 의미없다.
+	// - 대신 메소드 이름이 나중에 각각의 Advice에서 식별자로 사용됨
+	@Pointcut("execution(public * com.test.memo.Memo.*(..))")
+	public void m1() {
+		
+	}
+	
+	//보조업무 추가
+	// - 메모를 작성하는데 걸리는 시간을 로그에 남기는 보조업무
+
+	//보조업무 생성과 동시에 Adivce 설정도 같이 선언
+	// - 아래의 어노테이션이 기존의 XML <aop:around> 역할을 한다.
+	// - 어노테이션의 메소드 참조 표현("m1()")을 통해 위의 @Pointcut을 인식하고 연결한다. 
+	// - 결국 이 어노테이션이 Advice와 Pointcut을 연결시키는 작업을 한다.
+	// - 어노테이션을 제외한 메소드 내부 구현은 동일하다.
+	@Around("m1()") 
+	public void arround(ProceedingJoinPoint joinPoint) throws Throwable {
+
+		// 보조업무 시작
+		long start = System.currentTimeMillis();
+		System.out.println("시간 기록 시작");
+
+		try {
+
+			// 주업무 시작
+			joinPoint.proceed();
+			// 주업무 끝
+
+		} finally {
+
+			long finish = System.currentTimeMillis();
+			System.out.println("시간 기록 끝");
+			System.out.println("주업무 실행시간 : " + (finish - start) + "ms");
+			// 보조업무 끝
+
+		}
+
+	}
+	
+}
+
+
+[MainTest.java]
+
+public class MainTest {
+
+	public static void main(String[] args) {
+
+		//XML 설정 로드하기
+		ApplicationContext context = new GenericXmlApplicationContext("classpath:memo.xml");
+
+		//빈 객체 생성하기
+		IMemo memo = context.getBean("memo", IMemo.class);
+		
+		//메모 쓰기 (프록시 객체를 통한 주업무 호출)
+		memo.write("스프링 공부하기");
+
+	}
+	
+}
+
+
+[memo.xml]
+
+<!--  
+	- 나머지 하위의 모든 AOP 설정이 사라지고 보조업무 객체의 어노테이션으로 대신한다.
+	- 아래의 <aop:aspectj-autoproxy />가 AOP 관련 어노테이션 동작이 가능하게 설정해줌.
+-->		
+<aop:aspectj-autoproxy />	
+
+<!-- 주 업무 객체 -->
+<bean id="memo" class="com.test.memo.Memo"/>
+
+<!-- 보조 업무 객체 -->
+<bean id="logger" class="com.test.memo.Logger"/>
+
+
+{실행결과}
+
+====================================
+시간 기록 시작
+메모 : 스프링 공부하기
+시간 기록 끝
+주업무 실행시간 : 0ms
+====================================
+
+>>>>>> XML 스키마를 사용하는 방법에서 어노테이션을 사용하는 방법으로 바뀌면서 
+Pointcut과 Adivce를 연결시켜주는 설정 부분이 XML에서 보조업무객체로 이동한 것을 제외하면 나머지 부분은 동일하다.
+
+
+	e. 이미 작성한 보조 업무가 다른 주업무에도 동일하게 적용되는지 확인하기
+		- 메모 작성할 때 뿐만 아니라 메모 수정할 때에도 시간 기록을 로그로 남기고 싶다.
+		- 주업무만 추가하고 보조업무는 건드릴 필요가 없다.
+		1. IMemo.java 내용 추가하기
+		2. Memo.java 내용 추가하기
+		3. MainTest.java 내용 추가하기
+	
+[업무 순서] 주업무(######) 보조업무(*******)
+▶   시간 기록 시작       메모 수정        시간 기록 끝    ▶
+   *********************############********************
+
+[IMemo.java]
+
+public interface IMemo {
+
+	..	
+
+	//주업무 추가 - 메모 수정하기
+	void edit(String memo); 
+
+}
+
+
+[Memo.java]
+
+public class Memo implements IMemo {
+
+	..
+
+	@Override //주업무 추가 - 메모 수정하기
+	public void edit(String memo) {
+		
+		System.out.println("메모 수정 : " + memo);
+		
+	}
+
+}
+
+
+[MainTest.java]
+
+public class MainTest {
+
+	public static void main(String[] args) {
+
+		..
+		
+		//메모 수정 (주업무 추가)
+		memo.edit("AOP 어노테이션 정리하기");
+
+	}
+
+}
+
+
+{실행결과}
+
+====================================
+시간 기록 시작
+메모 : 스프링 공부하기
+시간 기록 끝
+주업무 실행시간 : 0ms
+====================================
+====================================
+시간 기록 시작
+메모 수정: AOP 어노테이션 정리하기
+시간 기록 끝
+주업무 실행시간 : 0ms
+====================================
+
+>>>>>> 어노테이션 설정으로 AOP를 구현했더라도 이미 Advice가 동일한 형식의 Pointcut에 연결되어 있으므로 
+주업무만 추가하면 된다. 이전 프로젝트와 달라지는 것이 없다.
+
+
+	f. Before Advice 적용하기
+		- 메모 작성(수정)하기 전에 해당 시간을 로그에 기록하는 보조 업무를 추가
+		- 이번엔 새로운 Advice(보조업무)를 추가할 것이기 때문에 보조업무 객체를 편집
+		1. Logger.java 내용 추가하기
+
+[업무 순서] 주업무(######) 보조업무(*******)
+▶     시간 작성        메모 작성     ▶
+    ****************#############
+
+[Logger.java]
+
+@Aspect
+public class Logger {
+
+	..
+	
+	// 보조업무 추가
+	// - 메모를 작성하기 전 현재 시간을 로그에 남기는 보조업무
+	
+	//보조업무 생성과 동시에 Adivce 설정도 같이 선언
+	// - 아래의 어노테이션이 기존의 XML <aop:before> 역할을 한다.
+	// - Pointcut은 상단에 이미 선언되어 있기 때문에 지금 생성하는 Before Advice와 연결만 시켜준다.
+	@Before("m1()")
+	public void before() {
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+		String now = sdf.format(new Date());
+		
+		System.out.println("   메모 작성 날짜시간 : " + now);
+		
+		//System.out.printf("메모 작성 시간 : %tT\n", Calendar.getInstance());
+	}// end of before()--------------------
+
+}
+
+
+{실행결과}
+
+====================================
+시간 기록 시작
+   메모 작성 날짜시간 : 2016-09-02 19:40:41
+메모 : 스프링 공부하기
+시간 기록 끝
+주업무 실행시간 : 2ms
+====================================
+====================================
+시간 기록 시작
+   메모 작성 날짜시간 : 2016-09-02 19:40:41
+메모 수정: AOP 어노테이션 정리하기
+시간 기록 끝
+주업무 실행시간 : 0ms
+====================================
+
+>>>>> 이미 설정되어 있는 Pointcut("m1()")이 있기 때문에 
+@Before 어노테이션 통해 Advice를 추가해주는 것만으로 구현이 끝난다.
+
+
+	g. After Advice 적용하기
+		- 메모 작성(수정) 후 편집 횟수를 로그에 기록하는 보조 업무를 추가
+		- 새로운 Advice(보조업무)를 추가할 것이기 때문에 보조업무 객체를 편집
+		- After Advice는 주업무 실행 중 예외 발생과 무관하게 항상 실행된다.
+		1. Logger.java 내용 추가하기
+	
+	[업무 순서] 주업무 보조업무
+▶메모 작성편집 횟수 기록▶
+
+[Logger.java]
+
+public class Logger {
+
+	..
+	
+	// 보조업무 추가
+	// - 메모를 작성(수정)하면 편집 횟수를 누적해서 로그에 남기는 보조업무
+	
+	//보조업무 생성과 동시에 Adivce 설정도 같이 선언
+	// - 아래의 어노테이션이 기존의 XML <aop:after> 역할을 한다.
+	// - Pointcut은 상단에 이미 선언되어 있기 때문에 지금 생성하는 After Advice와 연결만 시켜준다.
+	public int cnt = 0;
+	
+	@After("m1()")
+	public void after() {
+		
+		cnt++;
+		System.out.printf("메모 편집 횟수 : %d회\n", cnt);
+		
+	}
+
+}
+
+
+{실행결과}
+
+====================================
+시간 기록 시작
+   메모 작성 날짜시간 : 2016-09-02 19:43:04
+메모 : 스프링 공부하기
+시간 기록 끝
+주업무 실행시간 : 2ms
+====================================
+메모 편집 횟수 : 1회
+====================================
+시간 기록 시작
+   메모 작성 날짜시간 : 2016-09-02 19:43:04
+메모 수정: AOP 어노테이션 정리하기
+시간 기록 끝
+주업무 실행시간 : 0ms
+====================================
+메모 편집 횟수 : 2회
+
+>>>>> XML 스키마 사용과 차이 없다.
+
+
+	h. After Returning Advice 적용하기
+		- 삭제한 메모 번호를 로그에 기록하는 보조 업무를 추가
+		- After Returning Advice는 주업무 실행을 예외 발생없이 성공했을 때 실행된다.
+		1. IMemo.java 내용 추가하기
+		2. Memo.java 내용 추가하기
+		3. MainTest.java 내용 추가하기
+		4. Logger.java 내용 추가하기
+
+[업무 순서] 주업무(######) 보조업무(*******)
+▶         메모 삭제           삭제한 메모 번호 기록    ▶
+      ###############******************************
+
+[IMemo.java]
+
+public interface IMemo {
+
+	..
+
+	//주업무 추가 - 메모 삭제하기
+	int del(int seq);
+
+}
+
+
+[Memo.java]
+
+public class Memo implements IMemo {
+
+	..
+
+	@Override //주업무 추가 - 메모 삭제하기
+	public int del(int seq) {
+		
+		System.out.println(seq + "번 메모 삭제");
+		
+		return seq;
+		
+	}
+
+}
+
+
+[MainTest.java]
+
+public class MainTest {
+
+	public static void main(String[] args) {
+
+		..
+
+		//주업무 실행 - 메모 삭제하기
+		memo.del(5);
+
+	}
+
+}
+
+
+[Logger.java]
+
+public class Logger {
+
+	..
+	
+	//보조업무 추가
+	// - 기존의 @Around("m1()") 을 삭제하고 테스트할것!!!
+	// - 메모를 삭제한뒤 삭제한 메모의 번호를 로그에 남기는 보조업무
+	// - 보조 객체의 인자명과 어노테이션의 returning의 인자명이 동일해야 한다.
+	
+	//보조업무 생성과 동시에 Adivce 설정도 같이 선언
+	// - 아래의 어노테이션이 기존의 XML <aop:after-returning> 역할을 한다.
+	// - Pointcut은 상단에 이미 선언되어 있기 때문에 지금 생성하는 After Returning Advice와 연결만 시켜준다.
+	@AfterReturning(pointcut="m1()", returning="seq")
+	public void afterreturning(Object seq) {
+		
+		System.out.println("삭제된 메모 번호 : " + seq);
+		
+	}
+
+}
+
+
+{실행결과}
+
+59번 메모 삭제
+삭제된 메모 번호 : 59
+
+>>>>> return값을 받아주는 표현이외에는 XML 스키마 사용과 동일하다.
+
+
+	i. After Throwing Advice 적용하기
+		- 메모 읽기 중 예외가 발생하면 로그에 기록하는 보조 업무를 추가
+		- 주로 예외에 관련된 기록(처리)만을 따로 관리하는 용도로 사용
+		- After Throwing Advice는 주업무 실행 중 예외가 발생했을 때 실행된다.
+		1. IMemo.java 내용 추가하기
+		2. Memo.java 내용 추가하기
+		3. MainTest.java 내용 추가하기
+		4. Logger.java 내용 추가하기
+
+[업무 순서] 주업무(######) 보조업무(*******)
+▶          메모 읽기            읽기 실패 기록    ▶
+      ###############************************   
+
+[IMemo.java]
+
+public interface IMemo {
+
+	..
+
+	//주업무 추가 - 메모 읽기
+	void read(int seq) throws Exception; //주업무 추가
+
+}
+
+
+[Memo.java]
+
+public class Memo implements IMemo {
+
+	..
+	
+	public void read(int seq) throws Exception {
+		
+		if (seq < 1) {
+			throw new Exception("번호 오류 " + seq);
+		}
+		
+		System.out.println(seq + "번 메모 읽기");
+		
+	}
+
+}
+
+
+[MainTest.java]
+
+public class MainTest {
+
+	public static void main(String[] args) {
+
+		..
+		
+		//메모 읽기
+		try {
+			memo.read(10);
+			memo.read(-2);			
+		} catch (Exception e) {
+		}
+
+	}
+
+}
+
+
+[Logger.java]
+
+public class Logger {
+
+	..
+
+	//보조업무 추가
+	// - 메모를 읽다가 예외가 발생하면 로그에 남기는 보조업무
+	// - 보조 객체의 파라미터명과 어노테이션의 throwing의 파라미터명이 동일해야 한다.
+	
+	//보조업무 생성과 동시에 Advice 설정도 같이 선언
+	// - 아래의 어노테이션이 기존의 XML <aop:after-throwing> 역할을 한다.
+	// - Pointcut은 상단에 이미 선언되어 있기 때문에 지금 생성하는 After Throwing Advice와 연결만 시켜준다.
+	@AfterThrowing(pointcut="m1()", throwing="e")
+	public void afterthrowing(Exception e) {
+		
+		System.out.println("예외 기록 : " + e.getMessage());
+		
+	}
+
+}
+
+
+{실행결과}
+
+10번 메모 읽기
+예외 기록 : 번호 오류 -2
+
+>>>>>>>역시 예외 객체를 받아주는 표현이외에는 XML 스키마 사용과 동일하다.

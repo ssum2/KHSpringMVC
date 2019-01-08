@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<class-diagram version="1.2.2" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
+  associations="true" dependencies="false" nesting-relationships="true" router="FAN">  
+  <package id="1" language="java" name="com.spring.board" project="Board" file="/Board/src/main/java/com/spring/board" 
+    binary="false" corner="BOTTOM_RIGHT">    
+    <position height="50" width="124" x="161" y="-671"/>    
+    <display autosize="true" stereotype="true" sort-features="false" accessors="true"/>  
+  </package>  
+  <class id="2" language="java" name="com.spring.board.model.BoardDAO" project="Board" 
+    file="/Board/src/main/java/com/spring/board/model/BoardDAO.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="477" width="344" x="1605" y="-671"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <interface id="3" language="java" name="com.spring.board.model.InterBoardDAO" project="Board" 
+    file="/Board/src/main/java/com/spring/board/model/InterBoardDAO.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="441" width="344" x="3254" y="1106"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <interface id="4" language="java" name="com.spring.board.service.InterBoardService" project="Board" 
+    file="/Board/src/main/java/com/spring/board/service/InterBoardService.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="351" width="344" x="5180" y="1106"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </interface>  
+  <class id="5" language="java" name="com.spring.common.MyUtil" project="Board" 
+    file="/Board/src/main/java/com/spring/common/MyUtil.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="279" width="354" x="325" y="-671"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <package id="6" language="java" name="com.spring.board.aop" project="Board" 
+    file="/Board/src/main/java/com/spring/board/aop" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="50" width="148" x="719" y="-671"/>    
+    <display autosize="true" stereotype="true" sort-features="false" accessors="true"/>  
+  </package>  
+  <class id="7" language="java" name="com.spring.common.MyKey" project="Board" 
+    file="/Board/src/main/java/com/spring/common/MyKey.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="99" width="95" x="907" y="-671"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="8" language="java" name="com.spring.board.aop.LoginCheck" project="Board" 
+    file="/Board/src/main/java/com/spring/board/aop/LoginCheck.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="117" width="131" x="1042" y="-671"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="9" language="java" name="com.spring.board.controller.BoardController" project="Board" 
+    file="/Board/src/main/java/com/spring/board/controller/BoardController.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="369" width="371" x="5287" y="-671"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="10" language="java" name="com.spring.common.AES256" project="Board" 
+    file="/Board/src/main/java/com/spring/common/AES256.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="153" width="130" x="5010" y="1106"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="11" language="java" name="com.spring.common.SHA256" project="Board" 
+    file="/Board/src/main/java/com/spring/common/SHA256.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="99" width="130" x="1213" y="-671"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <package id="12" language="java" name="com.spring.board.controller" project="Board" 
+    file="/Board/src/main/java/com/spring/board/controller" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="50" width="182" x="1383" y="-671"/>    
+    <display autosize="true" stereotype="true" sort-features="false" accessors="true"/>  
+  </package>  
+  <package id="13" language="java" name="com.spring.common" project="Board" 
+    file="/Board/src/main/java/com/spring/common" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="50" width="141" x="1989" y="-671"/>    
+    <display autosize="true" stereotype="true" sort-features="false" accessors="true"/>  
+  </package>  
+  <class id="14" language="java" name="com.spring.board.model.BoardVO" project="Board" 
+    file="/Board/src/main/java/com/spring/board/model/BoardVO.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="1233" width="696" x="2170" y="-671"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <package id="15" language="java" name="com.spring.board.service" project="Board" 
+    file="/Board/src/main/java/com/spring/board/service" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="50" width="169" x="2906" y="-671"/>    
+    <display autosize="true" stereotype="true" sort-features="false" accessors="true"/>  
+  </package>  
+  <package id="16" language="java" name="com.spring.member.model" project="Board" 
+    file="/Board/src/main/java/com/spring/member/model" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="50" width="176" x="3115" y="-671"/>    
+    <display autosize="true" stereotype="true" sort-features="false" accessors="true"/>  
+  </package>  
+  <package id="17" language="java" name="com.spring.board.model" project="Board" 
+    file="/Board/src/main/java/com/spring/board/model" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="50" width="162" x="3331" y="-671"/>    
+    <display autosize="true" stereotype="true" sort-features="false" accessors="true"/>  
+  </package>  
+  <package id="18" language="java" name="com.spring.board.mapper" project="Board" 
+    file="/Board/src/main/java/com/spring/board/mapper" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="50" width="171" x="3533" y="-671"/>    
+    <display autosize="true" stereotype="true" sort-features="false" accessors="true"/>  
+  </package>  
+  <class id="19" language="java" name="com.spring.board.model.CommentVO" project="Board" 
+    file="/Board/src/main/java/com/spring/board/model/CommentVO.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="477" width="308" x="3744" y="-671"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="20" language="java" name="com.spring.board.service.BoardService" project="Board" 
+    file="/Board/src/main/java/com/spring/board/service/BoardService.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="369" width="344" x="4903" y="-671"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <class id="21" language="java" name="com.spring.member.model.MemberVO" project="Board" 
+    file="/Board/src/main/java/com/spring/member/model/MemberVO.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="1737" width="771" x="4092" y="-671"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+      sort-features="false" accessors="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true" static="true"/>      
+      <operations public="true" package="true" protected="true" private="true" static="true"/>    
+    </display>  
+  </class>  
+  <association id="22">    
+    <end type="SOURCE" refId="9" navigable="false">      
+      <attribute id="23" name="aes"/>      
+      <multiplicity id="24" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="10" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="25">    
+    <end type="SOURCE" refId="20" navigable="false">      
+      <attribute id="26" name="aes"/>      
+      <multiplicity id="27" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="10" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <realization id="28">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="3"/>  
+  </realization>  
+  <association id="29">    
+    <end type="SOURCE" refId="9" navigable="false">      
+      <attribute id="30" name="service"/>      
+      <multiplicity id="31" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="4" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <realization id="32">    
+    <end type="SOURCE" refId="20"/>    
+    <end type="TARGET" refId="4"/>  
+  </realization>  
+  <association id="33">    
+    <end type="SOURCE" refId="20" navigable="false">      
+      <attribute id="34" name="dao"/>      
+      <multiplicity id="35" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="3" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+    sort-features="false" accessors="true" visibility="true">    
+    <attributes public="true" package="true" protected="true" private="true" static="true"/>    
+    <operations public="true" package="true" protected="true" private="true" static="true"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>
