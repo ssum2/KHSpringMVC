@@ -8,11 +8,10 @@
 <%-- ======= #25. tiles1 중 header 페이지 만들기  ======= --%>
 <%
 	String cxtPath = request.getContextPath();
-
-	//=== 서버 IP 주소 알아오기 === //
-	InetAddress inet = InetAddress.getLocalHost();
-	String serverIP = inet.getHostAddress(); 
-	int portnumber = request.getServerPort();
+	// ===== #172. 웹채팅관련3; 서버 IP 주소 알아오기 === //
+	InetAddress inet = InetAddress.getLocalHost(); // inet주소
+	String serverIP = inet.getHostAddress(); // 아이피주소; 192.168.50.48
+	int portnumber = request.getServerPort(); // 포트 번호; 9090
 	
 	String serverName = "http://"+serverIP+":"+portnumber;
 %>
@@ -23,7 +22,10 @@
 			data-toggle="dropdown" href="#">Home <span class="caret"></span></a>
 			<ul class="dropdown-menu">
 				<li><a href="<%=cxtPath%>/index.action">Home</a></li>
-				<%-- <li><a href="<%=serverName%><%=cxtPath%>/chatting/multichat.action">웹채팅</a></li> --%>
+				
+				<%-- [190115] --%>
+				<%-- 헤더에 웹채팅 메뉴 넣기 --%>
+				<li><a href="<%=serverName%><%=cxtPath%>/chatting/multichat.action">웹채팅</a></li>
 				<li><a href="#">Submenu 1-3</a></li>
 			</ul></li>
 	<li class="dropdown"><a class="dropdown-toggle"
