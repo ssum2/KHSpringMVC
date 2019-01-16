@@ -202,3 +202,83 @@ from HR.employees e left join hr.departments d
 on e.department_id = d.department_id
 group by nvl(e.department_id,-1), nvl(department_name, '소속없음')
 order by 1;
+
+
+
+-- [190116]
+---------------------------------------------------------------------------
+    ----- ***** Mybatis 에서 프로시저 호출해서 사용하기 ***** -------
+---------------------------------------------------------------------------
+-- 1) insert procedure
+select no ,name, email ,tel, addr, writeday, birthday
+from spring_mybatistest
+order by no desc;
+
+desc spring_mybatistest;
+
+
+create or replace procedure pcd_spring_mybatistest_insert
+(p_name     IN  spring_mybatistest.name%type
+,p_email    IN  spring_mybatistest.email%type
+,p_tel      IN  spring_mybatistest.tel%type
+,p_addr     IN  spring_mybatistest.addr%type
+)
+is
+begin
+      insert into spring_mybatistest(no, name, email, tel, addr) 
+      values(seq_mybatistest.nextval, p_name, p_email, p_tel, p_addr);
+end pcd_spring_mybatistest_insert;
+
+
+
+-- 2) select procedure
+-- 사원 번호를 받아서 사원정보 출력하기
+select E.employee_id , E.first_name || ' ' || E.last_name as ENAME,
+        case when substr(E.jubun, 7, 1) in ('1','3') then '남' else '여' end as GENDER , 
+        extract(year from sysdate) - ( to_number(substr(E.jubun, 1, 2)) + 
+                                       case when substr(E.jubun, 7, 1) in('1','2') then 1900 else 2000 end
+                                      ) as AGE,
+        D.department_name , E.job_id,
+        ltrim( to_char( nvl(E.salary + (E.salary * E.commission_pct), E.salary)*12, '999,999,999') ) ||'원' as YEARSAL
+from hr.employees E left join hr.departments D
+on E.department_id = D.department_id
+where E.employee_id = 101;
+
+-- in모드는 입력값, out모드는 프로시저를 통해 도출되는 출력값
+create or replace procedure pcd_employees_select
+( p_employee_id       IN      hr.employees.employee_id%type  -- p_employee_id   IN   VARCHAR2    <===  이렇게 해도 나온다.
+ ,cur_employee_info   OUT     SYS_REFCURSOR)
+is
+begin
+  OPEN cur_employee_info FOR 
+  select E.employee_id , E.first_name || ' ' || E.last_name as ENAME,
+            case when substr(E.jubun, 7, 1) in ('1','3') then '남' else '여' end as GENDER , 
+            extract(year from sysdate) - ( to_number(substr(E.jubun, 1, 2)) + 
+                                           case when substr(E.jubun, 7, 1) in('1','2') then 1900 else 2000 end
+                                          ) as AGE,
+            D.department_name , E.job_id,
+            ltrim( to_char( nvl(E.salary + (E.salary * E.commission_pct), E.salary)*12, '999,999,999') ) ||'원' as YEARSAL
+  from hr.employees E left join hr.departments D
+  on E.department_id = D.department_id
+  where E.employee_id = p_employee_id;
+end pcd_employees_select;
+
+-- 3) 부서번호를 받아서 여러 사원 출력하기3
+create or replace procedure pcd_employees_select2
+( p_department_id       IN      hr.employees.department_id%type 
+ ,cur_employee_info     OUT     SYS_REFCURSOR)
+is
+begin
+  OPEN cur_employee_info FOR 
+  select E.employee_id , E.first_name || ' ' || E.last_name as ENAME,
+            case when substr(E.jubun, 7, 1) in ('1','3') then '남' else '여' end as GENDER , 
+            extract(year from sysdate) - ( to_number(substr(E.jubun, 1, 2)) + 
+                                           case when substr(E.jubun, 7, 1) in('1','2') then 1900 else 2000 end
+                                          ) as AGE,
+            D.department_name , E.job_id,
+            ltrim( to_char( nvl(E.salary + (E.salary * E.commission_pct), E.salary)*12, '999,999,999') ) ||'원' as YEARSAL
+  from hr.employees E left join hr.departments D
+  on E.department_id = D.department_id
+  where E.department_id = p_department_id
+  order by employee_id asc;
+end pcd_employees_select2;

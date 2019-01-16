@@ -1,5 +1,6 @@
 package com.test.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -161,5 +162,36 @@ public class MyBatisTestDAO implements InterMyBatisTestDAO{
 	public List<HashMap<String, String>> mbtest15_deptno() {
 		List<HashMap<String, String>> deptnoList = sqlsession.selectList("testdb.mbtest15_deptno");
 		return deptnoList;
+	}
+
+//	[190116]
+//	#프로시저를 호출하여 insert하기
+	@Override
+	public void mbtest17(HashMap<String, String> paraMap) {
+		sqlsession.insert("testdb.mbtest17",paraMap);
+		
+	}
+
+//	#프로시저를 호출하여 select 하기
+	@Override
+	public ArrayList<EmployeeVO> mbtest18(HashMap<String, Object> paraMap) {
+		sqlsession.selectOne("testdb.mbtest18", paraMap);
+		// 일반적인 select 쿼리인 경우는 selectOne() 메소드의 결과물을 리턴해주면 되지만
+		// 프로시저를 사용하여 OUT 타입 변수로 결과를 리턴받을 경우엔 selectOne() 의 결과로는 아무것도 리턴되지 않는다.
+		// 프로시저를 사용할 경우에는 selectOne() 메소드를 호출할때 넘겨준 파라미터인 
+		// HashMap<String, Object> paraMap 에 select 되어진 결과물을 담아서 넘겨준다!!!!!
+		
+		// select된 결과물을 paraMap에 넣어주기 때문에 값을 가져와야함
+		// 결과물을 리턴타입으로 캐스팅한 후 리턴
+		ArrayList<EmployeeVO> employeeInfoList =(ArrayList<EmployeeVO>)paraMap.get("EMPLOYEEINFO");
+		return employeeInfoList;
+	}
+
+//	#프로시저를 호출하여 select 하기(2); 여러행 출력하기
+	@Override
+	public ArrayList<EmployeeVO> mbtest19(HashMap<String, Object> paraMap) {
+		sqlsession.selectOne("testdb.mbtest19", paraMap);
+		ArrayList<EmployeeVO> employeeInfoList =(ArrayList<EmployeeVO>)paraMap.get("EMPLOYEEINFO");
+		return employeeInfoList;
 	}
 }

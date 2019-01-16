@@ -282,4 +282,51 @@
 		order by 1
 	</select>
 	
+<!-- [190116] -->
+<!-- #MyBatis에서  프로시저를 호출하여 insert하기
+	 >>	프로시저를 호출하기 위해서 CallableStatement를 사용
+	 {call 프로시저명(파라미터변수, mode=IN 또는 OUT) }
+	 오라클은 대문자가 원칙이기 때문에 웬만하면 대문자로 변환해서 사용하기
+-->
+	<insert id="mbtest17" statementType="CALLABLE" parameterType="HashMap">
+		{call PCD_SPRING_MYBATISTEST_INSERT(#{NAME, mode=IN}, #{EMAIL, mode=IN}, #{TEL, mode=IN}, #{ADDR, mode=IN})}
+	</insert>
+	
+<!-- #MyBatis에서  프로시저를 호출하여 select하기
+	 >> 프로시저의 파라미터는 in, out 모드 두가지이기 때문에 parameterMap 사용
+	 xml에서 out모드의 키값을 정해주고 이를 dao에서 get으로 끌어옴
+	 jdbcType은 varchar타입으로해야 모든 데이터타입이 다 호환됨
+	  파라미터맵과 프로시저의 파라미터순서는 반드시 일치해야함 
+	  
+	 >> 반환값으로 resultMap 사용; 파라미터맵의 Out모드 파라미터의 resultMap 적용 
+	 javaType은 String으로 해서 모든 타입 호환
+	 column은 오라클의 컬럼명, property는 VO의 set다음의 변수명, 첫 글자는 소문자로 시작
+-->
+	<resultMap type="com.test.model.EmployeeVO" id="mbtest18ResultMap">
+		<result property="employee_id" 		column="EMPLOYEE_ID" 		javaType="String"/>
+		<result property="ename" 			column="ENAME" 				javaType="String"/>
+		<result property="gender" 			column="GENDER" 			javaType="String"/>
+		<result property="age" 				column="AGE" 				javaType="String"/>
+		<result property="department_name" 	column="DEPARTMENT_NAME" 	javaType="String"/>
+		<result property="job_id" 			column="JOB_ID" 			javaType="String"/>
+		<result property="yearsal" 			column="YEARSAL" 			javaType="String"/>
+	</resultMap>
+	<parameterMap type="HashMap" id="mbtest18_parameterMap">
+		<parameter property="EMPLOYEE_ID" mode="IN" jdbcType="VARCHAR" javaType="String"/>
+		<parameter property="EMPLOYEEINFO" mode="OUT" jdbcType="CURSOR" resultMap="mbtest18ResultMap"/>
+	</parameterMap>
+	<select id="mbtest18" statementType="CALLABLE" parameterMap="mbtest18_parameterMap">
+		{call PCD_EMPLOYEES_SELECT(?,?)}
+	</select>
+	
+<!-- #MyBatis에서  프로시저를 호출하여 select하기(2); 여러행 출력하기
+		resultMap은 18번 재탕
+-->
+	<parameterMap type="HashMap" id="mbtest19_parameterMap">
+		<parameter property="DEPARTMENT_ID" mode="IN" jdbcType="VARCHAR" javaType="String"/>
+		<parameter property="EMPLOYEEINFO" mode="OUT" jdbcType="CURSOR" resultMap="mbtest18ResultMap"/>
+	</parameterMap>
+	<select id="mbtest19" statementType="CALLABLE" parameterMap="mbtest19_parameterMap">
+		{call PCD_EMPLOYEES_SELECT2(?,?)}
+	</select>
 </mapper>

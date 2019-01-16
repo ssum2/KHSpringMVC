@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.test.model.EmployeeVO;
 import com.test.model.MemberVO;
 import com.test.model.MemberVO2;
 import com.test.model.MyBatisTestVO;
@@ -827,4 +828,96 @@ public class MyBatisTestController {
 		}
 		return resultMapList;
 	}
+
+	
+	
+// [190116]
+// **** Mybatis 에서 Procedure 사용하기 **** //
+// ***** Mybatis 에서 Procedure 를 사용하여 insert 하기 ***** //
+// VO를 사용하지 않고 HashMap 을 사용하여  DB에 insert 하도록 하겠다. ***
+	@RequestMapping(value = "/mybatistest/mybatisTest17.action", method = { RequestMethod.GET })
+	public String mybatisTest17() {
+
+// 글쓰기 form 페이지를 띄우려고 한다.
+		return "register/mybatisTest17AddForm";
+//   /WEB-INF/views/register/mybatisTest17AddForm.jsp 를 파일을 생성한다.
+	}
+
+	@RequestMapping(value = "/mybatistest/mybatisTest17End.action", method = { RequestMethod.POST })
+	public String mybatisTest17End(HttpServletRequest req) {
+
+// 1. form 에서 넘어온 값 받기
+		String name = req.getParameter("name");
+		String email = req.getParameter("email");
+		String tel = req.getParameter("tel");
+		String addr = req.getParameter("addr");
+
+// 2. HashMap으로 저장시킨다. 
+		HashMap<String, String> paraMap = new HashMap<String, String>();
+
+		paraMap.put("NAME", name);
+		paraMap.put("EMAIL", email);
+		paraMap.put("TEL", tel);
+		paraMap.put("ADDR", addr);
+
+// 3. Service 단으로 HashMap 을 넘긴다.
+//		프로시저는 반환값이 없기 때문에 성공 실패 여부를 가리려면 예외처리를 해줘야함
+		String msg = "";
+		try {
+			service.mbtest17(paraMap);
+			msg = "회원가입 성공!!";
+			req.setAttribute("msg", msg);
+			return "register/mybatisTest17AddEnd";
+		} catch (Exception e) {
+			msg = "회원가입 실패!!";
+			req.setAttribute("msg", msg);
+			return "register/mybatisTest17AddEnd";
+		}
+
+//   /WEB-INF/views/register/mybatisTest17AddEnd.jsp 를 파일을 생성한다.
+	}
+	
+// ***** 사원번호를 입력받아서 Mybatis 에서 Procedure 를 사용하여 한명의 사원정보 select 하기 ***** //
+	@RequestMapping(value="/mybatistest/mybatisTest18.action", method={RequestMethod.GET})       
+	public String mybatisTest18(HttpServletRequest req) {
+	
+		// 1. form 에서 넘어온 값 받기
+		String employee_id = req.getParameter("employee_id");
+		
+		// 2. HashMap으로 저장시킨다. (반드시 서비스단으로 보내야할 변수의 갯수가 1개 이더라도 HashMap 으로 만들어서 넘겨야 한다.!!!!)
+		// >> 오라클에서 호출하는 프로시저에서는 파라미터에 in모드, out모드 둘 다 받기 때문에 out모드의 결과물 때문에 HashMap형태로 보내야함
+		// out모드 결과물을 map에 다시 넘겨주기 때문에 모든 타입을 받을 수 있는 Object로 해야함
+		HashMap<String, Object> paraMap = new HashMap<String, Object>(); // !!!! Object 로 해야 한다. !!!!
+		paraMap.put("EMPLOYEE_ID", employee_id);
+				
+		// 3. Service 단으로 HashMap 을 넘기는데 그 결과값은 반드시 VO의 List 로 받아와야 한다.!!!!!
+		// 오라클 프로시저에서 실행한 커서는 행이 한개가 나올지 복수가 나올 지 모름 -> List형태로 받아야 호환 가능 
+		ArrayList<EmployeeVO> employeeInfoList = service.mbtest18(paraMap);
+			
+	    req.setAttribute("employeeInfoList", employeeInfoList);
+	    req.setAttribute("employee_id", employee_id);
+	
+	    return "search/mybatisTest18Search";
+	}
+	
+// ***** 부서번호를 입력받아서 Mybatis 에서 Procedure 를 사용하여 여러명의 사원정보 select 하기 ***** //
+	@RequestMapping(value="/mybatistest/mybatisTest19.action", method={RequestMethod.GET})       
+	public String mybatisTest19(HttpServletRequest req) {
+	
+		// 1. form 에서 넘어온 값 받기
+		String department_id = req.getParameter("department_id");
+
+		// 2. HashMap으로 저장시킨다. (반드시 서비스단으로 보내야할 변수의 갯수가 1개 이더라도 HashMap 으로 만들어서 넘겨야 한다.!!!!)
+		HashMap<String, Object> paraMap = new HashMap<String, Object>(); // !!!! Object 로 해야 한다. !!!!
+		paraMap.put("DEPARTMENT_ID", department_id);
+				
+		// 3. Service 단으로 HashMap 을 넘기는데 그 결과값은 반드시 VO의 List 로 받아와야 한다.!!!!!
+		ArrayList<EmployeeVO> employeeInfoList = service.mbtest19(paraMap);
+			
+	    req.setAttribute("employeeInfoList", employeeInfoList);
+	    req.setAttribute("department_id", department_id);
+	
+	    return "search/mybatisTest19Search";
+	}
+
 }

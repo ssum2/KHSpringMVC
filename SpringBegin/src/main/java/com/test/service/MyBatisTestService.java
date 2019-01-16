@@ -1,11 +1,13 @@
 package com.test.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.test.model.EmployeeVO;
 import com.test.model.MemberVO;
 import com.test.model.MemberVO2;
 import com.test.model.MyBatisTestDAO;
@@ -158,5 +160,23 @@ public class MyBatisTestService {
 	public List<HashMap<String, String>> mbtest15_deptno() {
 		List<HashMap<String, String>> deptnoList = dao.mbtest15_deptno();
 		return deptnoList;
+	}
+
+//	[190116]
+//	#프로시저 호출하여 insert하기
+	public void mbtest17(HashMap<String, String> paraMap) {
+		dao.mbtest17(paraMap); // 프로시저의 경우 return값이 없기 때문에 Controller에서 try~catch로 처리해야함
+	}
+
+//	#프로시저 호출하여 select 하기
+	public ArrayList<EmployeeVO> mbtest18(HashMap<String, Object> paraMap) {
+		ArrayList<EmployeeVO> employeeInfoList = dao.mbtest18(paraMap);
+		return employeeInfoList;
+	}
+
+//	#프로시저 호출하여 select 하기(2); 여러행 출력하기
+	public ArrayList<EmployeeVO> mbtest19(HashMap<String, Object> paraMap) {
+		ArrayList<EmployeeVO> employeeInfoList = dao.mbtest19(paraMap);
+		return employeeInfoList;
 	}
 }

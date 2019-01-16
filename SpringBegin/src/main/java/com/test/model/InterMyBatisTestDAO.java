@@ -1,5 +1,6 @@
 package com.test.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -43,5 +44,11 @@ public interface InterMyBatisTestDAO {
 	List<HashMap<String, String>> mbtest15_ageline();
 
 	List<HashMap<String, String>> mbtest15_deptno();
+
+	void mbtest17(HashMap<String, String> paraMap);
+
+	ArrayList<EmployeeVO> mbtest18(HashMap<String, Object> paraMap);
+
+	ArrayList<EmployeeVO> mbtest19(HashMap<String, Object> paraMap);
 	
 }
