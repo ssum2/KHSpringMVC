@@ -841,4 +841,12 @@ public class BoardController {
 		}
 		
 	}// end of void multiplePhotoUpload(HttpServletRequest req, HttpServletResponse res)---------------- 
+	
+//	[190121]
+//	#전국맛집찾기 페이지로 이동하기
+	@RequestMapping(value="/deliciousStore.action", method={RequestMethod.GET})
+	public String deliciousStore() {
+		
+		return "store/deliciousStore.tiles2";
+	}
 }

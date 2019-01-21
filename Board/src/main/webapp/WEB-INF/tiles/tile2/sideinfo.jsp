@@ -11,17 +11,40 @@
 <script src="https://code.highcharts.com/modules/drilldown.js"></script>
 
 <script type="text/javascript">
-
+	var weatherTimeCycle = 0; // 시간주기를 잡아주는 전역변수; 단위 밀리초
+	
 	$(document).ready(function() {
-		loopshowNowTime();
-		showRank();
+		loopshowNowTime();	// 현재 시각 출력하기
+		
+		// #매 30분 0초가 될 때마다 기상청 날씨 정보를 자동 갱신 
+		var now = new Date();
+		var minute = now.getMinutes();
+		
+		if(minute < 30){	// 현재시각 0분~29분 사이일 때
+			weatherTimeCycle = (30-minute)*60*1000; // 0분일 때 30분 / 5분일 때 25분
+		}
+		else if(minute == 30){ // 30분일 때
+			weatherTimeCycle = 1000;
+		}
+		else { // 31분~59분일 떄
+			weatherTimeCyle = (((60-minute))+30)*60*1000;
+		}
+		loopshowWeather();	// 기상청 날씨정보 공공API XML데이터 호출
+//		showRank();
 	}); // end of ready(); ---------------------------------
 
 	function showNowTime() {
 		
 		var now = new Date();
-	
-		var strNow = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
+		
+		var strNow = "";
+		var mon = now.getMonth() + 1;
+		if(mon < 10){
+			strNow = now.getFullYear() + "-0" + mon + "-" + now.getDate();
+		}
+		else{
+			now.getFullYear() + "-" + mon + "-" + now.getDate();
+		}
 		
 		var hour = "";
 	    if(now.getHours() >= 12) {
@@ -62,6 +85,80 @@
 					}, timejugi);
 		
 	}// end of loopshowNowTime() --------------------------
+	
+	
+// [190121]
+// #기상청 날씨정보 공공API XML 데이터 호출하기
+	function showWeather(){
+		$.ajax({
+			url: "<%= request.getContextPath() %>/weatherXML.action",
+			type: "GET",
+			dataType: "XML",
+			success: function(xml){
+				var rootElement = $(xml).find(":root");
+				// console.log($(rootElement).prop("tagName"));
+				// >> 최상위 루트의 태그명: current
+				
+				var weather = $(rootElement).find("weather");
+				// console.log($(weather).attr("year")+"년 "+$(weather).attr("month")+"월 "+$(weather).attr("day")+"일 "+$(weather).attr("hour")+"시");
+				// >> 2019년 01월 21일 10시
+				
+				var updateTime = $(weather).attr("year")+"년 "+$(weather).attr("month")+"월 "+$(weather).attr("day")+"일 "+$(weather).attr("hour")+"시";
+				
+				var localArr = $(rootElement).find("local");	// local 태그 정보 가져오기
+				// console.log("localArr.length: "+localArr.length);
+				// >> localArr.length: 95
+				
+				var html = "업데이트: <span style='font-weight: bold; '>"+updateTime+"</span>&nbsp;&nbsp;&nbsp;";
+				html += "<span class='btn btn-info' onClick='javascript:showWeather();'>update</span><br/>";
+				html += "<table class='table table-hover' align='center'>";
+				html += "<tr>";
+				html += "<th>지역</th>";
+				html += "<th>날씨</th>";
+				html += "<th>기온</th>";
+				html += "</tr>";
+				
+
+				for(var i=0; i<localArr.length; i++){
+					var local = $(localArr).eq(i);
+					/* .eq(index) 는 선택된 요소들을 인덱스 번호로 찾을 수 있는 선택자이다. 
+	           		 마치 배열의 인덱스(index)로 값(value)를 찾는 것과 같은 효과를 낸다.
+	   				*/
+	   				/* console.log($(local).text() 
+	   							+ " stn_id:" + $(local).attr("stn_id") 
+	   							+ " icon:" + $(local).attr("icon") 
+	   							+ " desc:" + $(local).attr("desc") 
+	   							+ " ta:" + $(local).attr("ta") ); */
+					html+="<tr><td>"+$(local).text()+"</td>";
+					html+="<td>"+$(local).attr("desc")+"</td>";
+					html+="<td>"+$(local).attr("ta")+"</td></tr>";
+				}
+				html += "</table>";
+				
+				
+				$("#displayWeather").html(html);
+				
+			},
+			error: function(request, status, error){
+				if(request.readyState == 0 || request.status == 0) return;
+				else alert("code: "+request.status+"\n"+"message: "+request.responseText+"\n"+"error: "+error);
+			}
+			
+		});
+	}
+	// #날씨 함수 반복하기
+	function loopshowWeather() {
+		showWeather();
+		
+		setTimeout(function() {
+			showWeather();	
+			}, weatherTimeCycle);
+		
+		setTimeout(function() {
+			loopshowWeather();	
+			}, weatherTimeCycle + (60*60*1000)); // cycle 돌고 난 뒤 1시간 뒤에 다시 호출
+		
+	}// end of loopshowWeather() --------------------------
 	
 	
 	function getTableRank() {
@@ -391,6 +488,7 @@
 	현재시각 :&nbsp; 
 	<div id="clock" style="display:inline;"></div>
 </div>
+<div id="displayWeather" style="min-width: 90%; max-height: 500px; overflow-y: scroll; margin-top: 20px; margin-bottom: 70px; padding-left: 10px; padding-right: 10px;"></div>
 <div id="displayRank" style="min-width: 90%; margin-top: 50px; margin-bottom: 50px; padding-left: 20px; padding-right: 20px;"></div>
 <div id="chart-container" style="min-width: 90%; min-height: 400px; margin: 0 auto; border: solid #F0FFFF 5px;"></div>
 	

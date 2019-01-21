@@ -26,7 +26,9 @@
 				<%-- [190115] --%>
 				<%-- 헤더에 웹채팅 메뉴 넣기 --%>
 				<li><a href="<%=serverName%><%=cxtPath%>/chatting/multichat.action">웹채팅</a></li>
-				<li><a href="#">Submenu 1-3</a></li>
+				<%-- [190121] --%>
+				<%-- 헤더에 전국맛집 메뉴 넣기; 공공api 사용 예제 --%>
+				<li><a href="<%=cxtPath%>/deliciousStore.action">전국맛집</a></li>
 			</ul></li>
 	<li class="dropdown"><a class="dropdown-toggle"
 			data-toggle="dropdown" href="#">게시판 <span class="caret"></span></a>
