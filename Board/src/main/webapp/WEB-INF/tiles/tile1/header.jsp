@@ -38,10 +38,10 @@
 				<li><a href="#">Submenu 2-3</a></li>
 			</ul></li>
 		<li class="dropdown"><a class="dropdown-toggle"
-			data-toggle="dropdown" href="#">주문(통계차트) <span class="caret"></span></a>
+			data-toggle="dropdown" href="#">스낵주문(통계차트) <span class="caret"></span></a>
 			<ul class="dropdown-menu">
-				<li><a href="<%=cxtPath%>/chart/order.action">주문하기</a></li>
-				<li><a href="<%=cxtPath%>/chart/myorderchart.action">나의주문내역차트</a></li>
+				<li><a href="<%=cxtPath%>/snackchart/snackorder.action">스낵주문하기</a></li>
+				<li><a href="#">Submenu 3-2</a></li>
 				<li><a href="#">Submenu 3-3</a></li>
 			</ul></li>	
 		
