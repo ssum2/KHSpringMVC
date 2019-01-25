@@ -714,3 +714,193 @@ on B.fk_snackno = D.snackno
 group by D.snackname, C.typename
 ) V
 where V.snackname = '감자깡';
+
+
+
+
+
+---------------------------------------------------------------------------------------
+-- [190125]
+-------------------------------------------------------------------
+   ----- *** 다중파일 첨부(업로드) 제품등록/제품입고 하기 *** -----
+-------------------------------------------------------------------
+create table spring_product_category
+(catecodeseq    number(8)     not null  -- 카테고리 코드 일련번호
+,catecode       varchar2(20)  not null  -- 카테고리 코드
+,catename       varchar2(100) not null  -- 카테고리명
+,constraint PK_spring_product_category primary key(catecodeseq)
+,constraint UQ_spring_product_category unique(catecode)
+);
+
+create sequence seq_spring_product_category
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocycle
+nocache;
+
+insert into spring_product_category values(seq_spring_product_category.nextval, '10000000', '전자제품');
+insert into spring_product_category values(seq_spring_product_category.nextval, '20000000', '의류');
+insert into spring_product_category values(seq_spring_product_category.nextval, '30000000', '도서');
+insert into spring_product_category values(seq_spring_product_category.nextval, '40000000', '자동차');
+
+commit;
+
+select *
+from spring_product_category;
+
+
+create table spring_product_spec
+(specseq    number(8)     not null  -- 제품스펙 일련번호
+,speccode   varchar2(20)  not null  -- 카테고리 코드
+,specname   varchar2(100) not null  -- 카테고리명
+,constraint PK_spring_product_spec primary key(specseq)
+,constraint UQ_spring_product_spec unique(speccode)
+);
+
+create sequence seq_spring_product_spec
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocycle
+nocache;
+
+insert into spring_product_spec values(seq_spring_product_spec.nextval, 'HIT','히트상품');
+insert into spring_product_spec values(seq_spring_product_spec.nextval, 'BEST','베스트상품');
+insert into spring_product_spec values(seq_spring_product_spec.nextval, 'NEW','신상품');
+
+commit;
+
+select specseq, speccode, specname
+from spring_product_spec;
+
+
+------- ====== 제품 테이블 : spring_product ====== -------
+create table spring_product
+(prodseq        number        not null   -- 제품일련번호(Primary Key)
+,prodname       varchar2(100) not null   -- 제품명
+,fk_catecode    varchar2(20)             -- 카테고리 코드(Foreign Key)
+,prodcompany    varchar2(50)             -- 제조회사명
+,prodqty        number        default 0  -- 제품 재고량(주의!!! insert 되어지는 대상이 아니라 제품입고 테이블의 insert 시 update 되어지는 컬럼이며, 동시에 제품판매 테이블의 insert 시 update 되어지는 컬럼이다)
+,price          number(10)    default 0  -- 제품 정가
+,saleprice      number(10)    default 0  -- 제품 판매가(할인해서 팔 것이므로)
+,fk_speccode    varchar2(20)             -- 'HIT', 'BEST', 'NEW' 등의 값을 가짐.
+,prodcontent    clob                     -- 제품설명  varchar2는 varchar2(4000) 최대값이므로
+                                         --          4000 byte 를 초과하는 경우 clob 를 사용한다.
+                                         --          clob 는 최대 4GB 까지 지원한다.
+,prodpoint      number(8) default 0      -- 포인트 점수                                         
+,constraint  PK_spring_product_prodseq primary key(prodseq)
+,constraint  FK_spring_product_fk_catecode foreign key(fk_catecode)
+                                           references spring_product_category(catecode)
+,constraint FK_spring_product_fk_prodspec foreign key(fk_speccode)
+                                           references spring_product_spec(speccode)
+);
+
+create sequence seq_spring_product
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocycle
+nocache;
+
+select *
+from spring_product;
+
+create table spring_productimage
+(prodimageseq         number    not null       -- 제품이미지 일련번호(Primary Key)
+,fk_prodseq           number    not null       -- 제품번호(Foreign Key)
+,imagefilename        varchar2(255) not null   -- 이미지파일명. WAS에 저장될 파일명(2019012545435345464367524654634.png)
+,imageorgFilename     varchar2(255) not null   -- 진짜 이미지파일명(쉐보레우측.png) // 사용자가 파일을 업로드 하거나 파일을 다운로드 할때 사용되어지는 파일명 
+,imagefileSize        number                   -- 파일크기
+,thumbnailFileName    varchar2(255)            -- WAS에 저장될 썸네일 파일명(2019012513165790354388015717.png). 
+                                               -- 썸네일 파일명을 받는 컬럼임. 
+,constraint PK_spring_productimage primary key(prodimageseq)
+,constraint FK_spring_productimage foreign key(fk_prodseq)
+                                   references spring_product(prodseq) on delete cascade 
+);
+
+create sequence seq_spring_productimage
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocycle
+nocache;
+
+select *
+from spring_productimage;
+
+create table spring_productibgo
+(productibgoseq    number  not null       -- 입고일련번호
+,prodseq           number  not null       -- 제품일련번호(Foreign Key)
+,ibgoqty           number  not null       -- 입고량
+,prodinputdate     date default sysdate   -- 제품입고일자
+,constraint PK_spring_productibgo primary key(productibgoseq)
+,constraint FK_spring_productibgo foreign key(prodseq)
+                                  references spring_product(prodseq) 
+); 
+
+create sequence seq_spring_productibgo
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocycle
+nocache;
+
+select productibgoseq, prodseq, ibgoqty, prodinputdate
+from spring_productibgo
+order by productibgoseq desc;
+
+
+---- 제품목록 조회 ----
+select A.catename, B.prodseq, B.prodname, B.prodcompany, B.prodqty, B.price, B.saleprice, B.prodcontent, B.prodpoint, C.specname
+from spring_product_category A join spring_product B
+on A.catecode = B.fk_catecode
+join spring_product_spec C
+on B.fk_speccode = C.speccode;
+
+
+---- *** 뷰 생성하기 *** ----
+create or replace view view_spring_productinfo
+as
+select A.catename, B.prodseq, B.prodname, B.prodcompany, B.prodqty, B.price, B.saleprice, B.prodcontent, B.prodpoint, C.specname
+from spring_product_category A join spring_product B
+on A.catecode = B.fk_catecode
+join spring_product_spec C
+on B.fk_speccode = C.speccode;
+
+select *
+from view_spring_productinfo;
+
+select catename, prodseq, prodname, prodcompany, prodqty, price, saleprice, prodcontent, prodpoint, specname
+from view_spring_productinfo
+where prodseq = 2;
+
+select *
+from spring_productimage;
+
+select *
+from spring_productimage
+where prodimageseq in (select min(prodimageseq)
+                       from spring_productimage
+                       group by fk_prodseq);
+
+
+select A.prodseq, A.catename, A.prodname, A.prodcompany, A.specname, B.thumbnailfilename
+from view_spring_productinfo A left join (select *
+                                          from spring_productimage
+                                          where prodimageseq in (select min(prodimageseq)
+                                                                 from spring_productimage
+                                                                 group by fk_prodseq)) B
+on A.prodseq = B.fk_prodseq;
+
+
+select imagefilename, imageorgfilename, imagefilesize, thumbnailfilename
+from spring_productimage
+where fk_prodseq = 2
+order by prodimageseq asc;
+

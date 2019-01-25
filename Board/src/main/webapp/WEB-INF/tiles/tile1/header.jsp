@@ -56,9 +56,9 @@
 			data-toggle="dropdown" href="#">제품등록(다중파일첨부) <span class="caret"></span></a>
 			<ul class="dropdown-menu">
 			    <li><a href="<%=cxtPath%>/product/addProduct.action">제품등록</a></li>
-				<li><a href="<%=cxtPath%>/product/productStore.action">제품입고</a></li>
+				<li><a href="<%=cxtPath%>/product/storeProduct.action">제품입고</a></li>
 			</ul></li>
-		</c:if>	
+		</c:if>
 		
 		<li class="dropdown"><a class="dropdown-toggle"
 			data-toggle="dropdown" href="#">로그인 <span class="caret"></span></a>
