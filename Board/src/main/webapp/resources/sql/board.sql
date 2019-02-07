@@ -904,3 +904,55 @@ from spring_productimage
 where fk_prodseq = 2
 order by prodimageseq asc;
 
+-- [190201]
+------ ==== Spring Scheduler(스프링 스케줄러)를 사용한 email 발송하기 예제 ==== ------
+create table scheduletest_reservation
+(reservationSeq    number        not null
+,fk_userid         varchar2(20)  not null
+,reservationDate   date          not null
+,mailSendCheck     number default 0 not null
+,constraint PK_scheduletest_reservation primary key(reservationSeq)
+,constraint FK_scheduletest_reservation foreign key(fk_userid) references jsp_member(userid)
+,constraint CK_scheduletest_reservation check(mailSendCheck in(0,1))
+);
+
+create sequence seq_scheduletest_reservation
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocycle
+nocache;
+
+select *
+from jsp_member
+order by idx asc;
+
+insert into scheduletest_reservation(reservationSeq, fk_userid, reservationDate)
+values(seq_scheduletest_reservation.nextval, 'ssum', to_date('2019-02-02 10:00','yyyy-mm-dd hh24:mi') );
+
+insert into scheduletest_reservation(reservationSeq, fk_userid, reservationDate)
+values(seq_scheduletest_reservation.nextval, 'kimkh1', to_date('2019-02-02 16:00','yyyy-mm-dd hh24:mi') );
+
+insert into scheduletest_reservation(reservationSeq, fk_userid, reservationDate)
+values(seq_scheduletest_reservation.nextval, 'kimkh2', to_date('2019-02-03 11:00','yyyy-mm-dd hh24:mi') );
+
+insert into scheduletest_reservation(reservationSeq, fk_userid, reservationDate)
+values(seq_scheduletest_reservation.nextval, 'kimkh3', to_date('2019-02-03 15:00','yyyy-mm-dd hh24:mi') );
+
+commit;
+
+select reservationSeq, fk_userid, 
+       to_char(reservationDate, 'yyyy-mm-dd hh24:mi:ss') as reservationDate, mailSendCheck
+from scheduletest_reservation;
+
+select R.reservationSeq, M.userid, M.name, M.email, 
+       to_char(R.reservationDate,'yyyy-mm-dd hh24:mm') as reservationDate
+from jsp_member M join scheduletest_reservation R
+on M.userid = R.fk_userid
+where to_char(reservationDate, 'yyyy-mm-dd') = to_char(sysdate+1, 'yyyy-mm-dd')
+and R.mailSendCheck = 0;
+
+
+update scheduletest_reservation set mailSendCheck = 1
+where reservationSeq IN ('1','2');
