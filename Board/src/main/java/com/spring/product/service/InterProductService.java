@@ -26,5 +26,7 @@ public interface InterProductService {
 	List<HashMap<String, String>> getviewProductImage(String fk_prodseq); // 특정제품의 원래이미지파일명 및 썸네일이미지파일명 가져오기 
 	
 	String getLargeImgFilename(HashMap<String, String> map); // 특정 썸네일이미지파일명에 대한 원래이미지파일명 가져오기 
-		
+
+//	[190201]
+	void scheduleTestEmailSending() throws Exception; // Spring Scheduler(스프링 스케줄러)를 사용한 email 발송하기 예제 
 }
