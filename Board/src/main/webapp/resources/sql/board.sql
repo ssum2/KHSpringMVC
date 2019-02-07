@@ -929,18 +929,23 @@ from jsp_member
 order by idx asc;
 
 insert into scheduletest_reservation(reservationSeq, fk_userid, reservationDate)
-values(seq_scheduletest_reservation.nextval, 'ssum', to_date('2019-02-02 10:00','yyyy-mm-dd hh24:mi') );
+values(seq_scheduletest_reservation.nextval, 'hongkd', to_date('2019-02-08 10:00','yyyy-mm-dd hh24:mi') );
 
 insert into scheduletest_reservation(reservationSeq, fk_userid, reservationDate)
-values(seq_scheduletest_reservation.nextval, 'kimkh1', to_date('2019-02-02 16:00','yyyy-mm-dd hh24:mi') );
+values(seq_scheduletest_reservation.nextval, 'leess', to_date('2019-02-08 16:00','yyyy-mm-dd hh24:mi') );
 
 insert into scheduletest_reservation(reservationSeq, fk_userid, reservationDate)
-values(seq_scheduletest_reservation.nextval, 'kimkh2', to_date('2019-02-03 11:00','yyyy-mm-dd hh24:mi') );
+values(seq_scheduletest_reservation.nextval, 'chaeunwoo', to_date('2019-02-09 11:00','yyyy-mm-dd hh24:mi') );
 
 insert into scheduletest_reservation(reservationSeq, fk_userid, reservationDate)
-values(seq_scheduletest_reservation.nextval, 'kimkh3', to_date('2019-02-03 15:00','yyyy-mm-dd hh24:mi') );
+values(seq_scheduletest_reservation.nextval, 'chaew1', to_date('2019-02-09 15:00','yyyy-mm-dd hh24:mi') );
 
 commit;
+
+update jsp_member set email='ceLUMtKVBfBFzHtCcLl4manuOE15mgsrRCFwv4GIlbA=';
+update jsp_member set email='9x82Du4VSQGwv8rAdCWdVuqaRat9XxZ4jILrNydZdn4=' where idx=2;
+
+update jsp_member set lastlogindate=sysdate, lastpwdchangedate=sysdate;
 
 select reservationSeq, fk_userid, 
        to_char(reservationDate, 'yyyy-mm-dd hh24:mi:ss') as reservationDate, mailSendCheck
